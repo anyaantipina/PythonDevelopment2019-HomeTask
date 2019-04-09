@@ -62,6 +62,7 @@ class MyApp(App):
     def askcolor(self):
         bg_txt = colorchooser.askcolor()[1]
         self.Canvas1.foreground.set(bg_txt)
+        self.Canvas2.foreground.set(bg_txt)
         colors_bg = [int(bg_txt[1:3], 16),int(bg_txt[3:5], 16),int(bg_txt[5:7], 16)]
         fg_red = int(random()*16)
         fg_green = int(random()*16)
@@ -73,9 +74,19 @@ class MyApp(App):
         fg_txt = '#%0x%0x%0x' % (colors_fg[0], colors_fg[1], colors_fg[2])
         self.ShowColor.configure(bg = bg_txt, fg = fg_txt)
 
+    def copy(self, event, index):
+        if (index == 1):
+            for item in self.Canvas1.find_all():
+                self.Canvas2.create_line((*self.Canvas1.coords(item)), fill = self.Canvas1.itemcget(item, "fill"))
+        else:
+            for item in self.Canvas2.find_all():
+                self.Canvas1.create_line((*self.Canvas2.coords(item)), fill = self.Canvas2.itemcget(item, "fill"))
+    
     def create(self):
         self.Canvas1 = Paint(self, foreground="midnightblue")
         self.Canvas1.grid(row=0, column=0, sticky=N+E+S+W)
+        self.Canvas2 = Paint(self, foreground="midnightblue")
+        self.Canvas2.grid(row=1, column=0, sticky=N+E+S+W)
         frame = Frame(self)
         frame.grid(row=0, column=1, rowspan = 2, sticky = N)
         frame.rowconfigure(0, weight=1)
@@ -88,10 +99,20 @@ class MyApp(App):
         self.ShowColor = Label(frame, textvariable=self.Canvas1.foreground, bg = "midnightblue", fg = "white")
         self.ShowColor.grid(row=1, column=0, sticky=N+W+E)
         self.Quit = Button(frame, text="Quit", command=self.quit)
-        self.Quit.grid(row=2, column=0, sticky=N+W)
+        self.Quit.grid(row=4, column=0, sticky=N+W)
+        self.Copy1_2 = Button(frame, text="Copy from 1 to 2")
+        self.Copy1_2.bind("<Button-1>", lambda event: self.copy(event, 1))
+        self.Copy1_2.grid(row=2, column=0, sticky=N+W)
+        self.Copy2_1 = Button(frame, text="Copy from 2 to 1")
+        self.Copy2_1.bind("<Button-1>", lambda event: self.copy(event, 2))
+        self.Copy2_1.grid(row=3, column=0, sticky=N+W)
 
 app = MyApp(Title="Canvas Example")
 app.mainloop()
-for item in app.Canvas.find_all():
-    print(*app.Canvas.coords(item), app.Canvas.itemcget(item, "fill"))
+print ("in Canvas1: ")
+for item in app.Canvas1.find_all():
+    print(*app.Canvas1.coords(item), app.Canvas1.itemcget(item, "fill"))
+print ("in Canvas2: ")
+for item in app.Canvas2.find_all():
+    print(*app.Canvas2.coords(item), app.Canvas2.itemcget(item, "fill"))
 
