@@ -5,6 +5,8 @@
 
 from tkinter import *
 from tkinter import colorchooser
+from random import random
+from math import fabs
 
 class App(Frame):
     '''Base framed application class'''
@@ -60,6 +62,16 @@ class MyApp(App):
     def askcolor(self):
         bg_txt = colorchooser.askcolor()[1]
         self.Canvas1.foreground.set(bg_txt)
+        colors_bg = [int(bg_txt[1:3], 16),int(bg_txt[3:5], 16),int(bg_txt[5:7], 16)]
+        fg_red = int(random()*16)
+        fg_green = int(random()*16)
+        fg_blue = int(random()*16)
+        colors_fg = [fg_red,fg_green,fg_blue]
+        for i in range(3):
+            if (fabs(colors_bg[i] - colors_fg[i]) % 16) < 3:
+                colors_fg[i] = (colors_fg[i] + 5) % 16
+        fg_txt = '#%0x%0x%0x' % (colors_fg[0], colors_fg[1], colors_fg[2])
+        self.ShowColor.configure(bg = bg_txt, fg = fg_txt)
 
     def create(self):
         self.Canvas1 = Paint(self, foreground="midnightblue")
@@ -73,7 +85,7 @@ class MyApp(App):
         frame.columnconfigure(1, weight=1)
         self.AskColor = Button(frame, text="Color", command=self.askcolor)
         self.AskColor.grid(row=0, column=0, sticky=N+W)
-        self.ShowColor = Label(frame, textvariable=self.Canvas1.foreground)
+        self.ShowColor = Label(frame, textvariable=self.Canvas1.foreground, bg = "midnightblue", fg = "white")
         self.ShowColor.grid(row=1, column=0, sticky=N+W+E)
         self.Quit = Button(frame, text="Quit", command=self.quit)
         self.Quit.grid(row=2, column=0, sticky=N+W)
