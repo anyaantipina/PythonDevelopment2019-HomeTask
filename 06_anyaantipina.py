@@ -7,6 +7,7 @@ from tkinter import *
 from tkinter import colorchooser
 from random import random
 from math import fabs
+from tkinter import filedialog as fd
 
 class App(Frame):
     '''Base framed application class'''
@@ -87,6 +88,23 @@ class MyApp(App):
             self.Canvas1.delete(ALL)
         else:
             self.Canvas2.delete(ALL)
+    def insert(self):
+        file_name = fd.askopenfilename()
+        file = open(file_name)
+        for s in file:
+            s = s.replace('\n','')
+            list = s.split(' ')
+            self.Canvas1.create_line((float(list[0]), float(list[1]), float(list[2]), float(list[3])), fill = list[4])
+            file.close()
+    
+    def extract(self):
+        file_name = fd.asksaveasfilename(filetypes=(("TXT files", "*.txt"),("All files", "*.*")))
+        file = open(file_name,'w')
+        for item in self.Canvas1.find_all():
+            list = self.Canvas1.coords(item)
+            s = str(list[0])+ ' ' + str(list[1]) + ' ' + str(list[2]) + ' ' + str(list[3]) + ' ' + app.Canvas1.itemcget(item, "fill") + '\n'
+            file.write(s)
+        file.close()
 
     def create(self):
         self.Canvas1 = Paint(self, foreground="midnightblue")
@@ -105,7 +123,7 @@ class MyApp(App):
         self.ShowColor = Label(frame, textvariable=self.Canvas1.foreground, bg = "midnightblue", fg = "white")
         self.ShowColor.grid(row=1, column=0, sticky=N+W+E)
         self.Quit = Button(frame, text="Quit", command=self.quit)
-        self.Quit.grid(row=6, column=0, sticky=N+W)
+        self.Quit.grid(row=7, column=0, sticky=N+W)
         self.Copy1_2 = Button(frame, text="Copy from 1 to 2")
         self.Copy1_2.bind("<Button-1>", lambda event: self.copy(event, 1))
         self.Copy1_2.grid(row=2, column=0, sticky=N+W)
@@ -118,6 +136,10 @@ class MyApp(App):
         self.Clean2 = Button(frame, text="Clean 2")
         self.Clean2.bind("<Button-1>", lambda event: self.clean(event, 2))
         self.Clean2.grid(row=5, column=0, sticky=N+W)
+        self.Open = Button(frame, text="Open", command=self.insert)
+        self.Open.grid(row=6, column=0, sticky=S+W+E)
+        self.Save = Button(frame, text="Save", command=self.extract)
+        self.Save.grid(row=6, column=1, sticky=S+W+E)
 
 app = MyApp(Title="Canvas Example")
 app.mainloop()
