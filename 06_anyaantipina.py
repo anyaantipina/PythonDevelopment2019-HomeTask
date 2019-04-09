@@ -51,6 +51,19 @@ class Paint(Canvas):
         self.cursor = None
         #print(self.find_all())
 
+    def select(self, event):
+        self.item = self.find_closest(event.x, event.y)
+    
+    def mousemove3(self, event):
+        coords = self.coords(self.item)
+        width = coords[2] - coords[0]
+        height = coords[3] - coords[1]
+        coords[0] = event.x - width/2
+        coords[2] = event.x + width/2
+        coords[1] = event.y - height/2
+        coords[3] = event.y + height/2
+        self.coords(self.item, coords)
+        
     def __init__(self, master=None, *ap, foreground="black", **an):
         self.foreground = StringVar()
         self.foreground.set(foreground)
@@ -58,6 +71,8 @@ class Paint(Canvas):
         self.bind("<Button-1>", self.mousedown)
         self.bind("<B1-Motion>", self.mousemove)
         self.bind("<ButtonRelease-1>", self.mouseup)
+        self.bind("<Button-3>", self.select)
+        self.bind("<B3-Motion>", self.mousemove3)
 
 class MyApp(App):
     def askcolor(self):
